@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using MugShop.Data;
+using MugShop.Helpers;
+using MugShop.Service.Implementations;
+using MugShop.Service.Interfaces.MugInterfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,7 +13,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
-
+builder.Services.AddScoped<IMug, MugRepo>();
+builder.Services.AddScoped<SKUGenerator>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

@@ -1,0 +1,30 @@
+﻿@using MugShop.Data.Entities
+@model List<MugShop.DTOs.MugDTOs.GetAllMugsDto>
+
+<h1>Mugs</h1>
+
+
+    <div class="table">
+    <div>
+        <ol>
+            <li>SKU</li>
+            <li>Name</li>
+            <li>Color</li>
+            <li>Price</li>
+            <li>In Stock?</li>
+        </ol>
+        </div>
+        <div>
+        @foreach (var mug in Model)
+        {
+            <div>
+                <p>@mug.SKU</p>
+                <p>@mug.Name</p>
+                <p>@mug.Color</p>
+                <p>@mug.Price.ToString("C")</p>
+                <p>@(mug.InStock ? "Yes" : "No")</p>
+            </div>
+        }
+        </div>
+    </div>
+}
