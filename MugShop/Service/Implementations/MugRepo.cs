@@ -160,5 +160,25 @@ namespace MugShop.Service.Implementations
                 IsSuccess = true
             };
         }
+        public async Task<APIResponse> DeleteMug(int id)
+        {
+            var mugExists = await _appDbContext.Mugs
+                .Where(mugs => mugs.DeletedAt == null)
+                .FirstOrDefaultAsync(mugs => mugs.Id == id);
+            if (mugExists == null)
+            {
+                return new APIResponse
+                {
+                    IsSuccess = false,
+                    Error = "Mug not found"
+                };
+            }
+            mugExists.DeletedAt = DateTime.UtcNow;
+            await _appDbContext.SaveChangesAsync();
+            return new APIResponse
+            {
+                IsSuccess = true
+            };
+        }
     }
 }
