@@ -7,7 +7,7 @@ using MugShop.DTOs.MugDTOs;
 using MugShop.Helpers;
 using MugShop.Service.Interfaces.MugInterfaces;
 
-namespace MugShop.Service.Implementations
+namespace MugShop.Service.Implementations.MugRepos
 {
     public class MugRepo : IMug
     {
@@ -154,6 +154,7 @@ namespace MugShop.Service.Implementations
             mugExists.InStock = mugInfo.InStock;
             mugExists.CategoryId = mugInfo.CategoryId;
             mugExists.UpdatedAt = DateTime.UtcNow;
+
             await _appDbContext.SaveChangesAsync();
             return new APIResponse
             {
@@ -165,6 +166,7 @@ namespace MugShop.Service.Implementations
             var mugExists = await _appDbContext.Mugs
                 .Where(mugs => mugs.DeletedAt == null)
                 .FirstOrDefaultAsync(mugs => mugs.Id == id);
+
             if (mugExists == null)
             {
                 return new APIResponse
@@ -173,6 +175,7 @@ namespace MugShop.Service.Implementations
                     Error = "Mug not found"
                 };
             }
+
             mugExists.DeletedAt = DateTime.UtcNow;
             await _appDbContext.SaveChangesAsync();
             return new APIResponse
