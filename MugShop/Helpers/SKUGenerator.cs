@@ -7,7 +7,7 @@ namespace MugShop.Helpers
     {
         public  string GenerateSKU(string name, string color, string category)
         {
-            var midCategory = category.Length % 2;
+            var midCategory = category.Length / 2;
 
             var categoryCode = string.Concat(category.AsSpan(0,1), category.AsSpan(midCategory, 1));
             var nameCode = string.Concat(name.AsSpan(0, 1), name.AsSpan(name.Length - 1, 1));

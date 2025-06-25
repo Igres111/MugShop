@@ -9,5 +9,6 @@ namespace MugShop.Service.Interfaces.MugInterfaces
     {
         public Task<APIResponse> CreateMug(CreateMugDto mugInfo);
         public Task<GetAllMugsResponse> GetAllMugs();
+        public Task<APIResponse> UpdateMug(UpdateMugDto mugInfo);
     }
 }
