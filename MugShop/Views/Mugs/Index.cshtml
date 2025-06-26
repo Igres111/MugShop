@@ -98,6 +98,71 @@
             <p>@(mug.InStock ? "Yes" : "No")</p>
         }
     </div>
+    <div class="flex-fill">
+        <p><strong>More Info </strong></p>
+        @foreach (var mug in Model.Mugs)
+        {
+            <p class="d-flex align-items-center">
+                <button type="button"
+                        class="btn btn-outline-primary btn-sm ms-2"
+                        style="width:1.5rem; height:1.5rem; padding:0.125rem; font-size:0.75rem; line-height:1;"
+                        data-bs-toggle="modal"
+                        data-bs-target="#mugModal@(mug.Id)">
+                    i
+                </button>
+            </p>
+        }
+    </div>
+    @foreach (var mug in Model.Mugs)
+    {
+        <div class="modal fade"
+             id="mugModal@(mug.Id)"
+             tabindex="-1"
+             aria-labelledby="mugModalLabel@(mug.Id)"
+             aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="mugModalLabel@mug.Id">
+                            @mug.Name Details
+                        </h5>
+                        <button type="button"
+                                class="btn-close"
+                                data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <dl class="row">
+                            <dt class="col-sm-4">SKU</dt>
+                            <dd class="col-sm-8">@mug.SKU</dd>
+
+                            <dt class="col-sm-4">Name</dt>
+                            <dd class="col-sm-8">@mug.Name</dd>
+
+                            <dt class="col-sm-4">Description</dt>
+                            <dd class="col-sm-8">@mug.Description</dd>
+
+                            <dt class="col-sm-4">Color</dt>
+                            <dd class="col-sm-8">@mug.Color</dd>
+
+                            <dt class="col-sm-4">Price</dt>
+                            <dd class="col-sm-8">@mug.Price.ToString("C")</dd>
+
+                            <dt class="col-sm-4">In Stock?</dt>
+                            <dd class="col-sm-8">@(mug.InStock ? "Yes" : "No")</dd>
+
+                            <dt class="col-sm-4">Category ID</dt>
+                            <dd class="col-sm-8">@mug.CategoryId</dd>
+                        </dl>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    }
 </div>
+
 
 <script src="~/js/burgerMenu.js"></script>
