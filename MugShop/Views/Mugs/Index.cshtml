@@ -49,6 +49,56 @@
     </div>
 
     <div class="col-auto">
+  <label class="form-label">Sort by</label>
+  <select name="sortBy" class="form-select">
+            @if (Model.SortBy == "price-asc")
+            {
+                <option value="price-asc" selected>Price: Low to High</option>
+            }
+            else
+            {
+                <option value="price-asc">Price: Low to High</option>
+            }
+
+            @if (Model.SortBy == "price-desc")
+            {
+                <option value="price-desc" selected>Price: High to Low</option>
+            }
+            else
+            {
+                <option value="price-desc">Price: High to Low</option>
+            }
+
+            @if (Model.SortBy == "name-asc")
+            {
+                <option value="name-asc" selected>Name: A to Z</option>
+            }
+            else
+            {
+                <option value="name-asc">Name: A to Z</option>
+            }
+
+            @if (Model.SortBy == "name-desc")
+            {
+                <option value="name-desc" selected>Name: Z to A</option>
+            }
+            else
+            {
+                <option value="name-desc">Name: Z to A</option>
+            }
+
+            @if (Model.SortBy == "newest")
+            {
+                <option value="newest" selected>Newest</option>
+            }
+            else
+            {
+                <option value="newest">Newest</option>
+            }
+  </select>
+</div>
+
+    <div class="col-auto">
         <button type="submit" class="btn btn-primary">Filter</button>
         <a asp-action="Index"
            asp-controller="Mugs"
@@ -162,7 +212,50 @@
             </div>
         </div>
     }
+
 </div>
+<nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+        <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
+            <a class="page-link"
+               asp-action="Index"
+               asp-route-pageNumber="@(Model.PageNumber - 1)"
+               asp-route-pageSize="@Model.PageSize"
+               asp-route-color="@Model.SelectedColor"
+               asp-route-minPrice="@Model.MinPrice"
+               asp-route-maxPrice="@Model.MaxPrice">
+                Previous
+            </a>
+        </li>
+
+        @for (int p = 1; p <= Model.TotalPages; p++)
+        {
+            <li class="page-item @(p == Model.PageNumber ? "active" : "")">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-pageNumber="@p"
+                   asp-route-pageSize="@Model.PageSize"
+                   asp-route-color="@Model.SelectedColor"
+                   asp-route-minPrice="@Model.MinPrice"
+                   asp-route-maxPrice="@Model.MaxPrice">
+                    @p
+                </a>
+            </li>
+        }
+
+        <li class="page-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
+            <a class="page-link"
+               asp-action="Index"
+               asp-route-pageNumber="@(Model.PageNumber + 1)"
+               asp-route-pageSize="@Model.PageSize"
+               asp-route-color="@Model.SelectedColor"
+               asp-route-minPrice="@Model.MinPrice"
+               asp-route-maxPrice="@Model.MaxPrice">
+                Next
+            </a>
+        </li>
+    </ul>
+</nav>
 
 
 <script src="~/js/burgerMenu.js"></script>

@@ -5,7 +5,9 @@ using MugShop.Data;
 using MugShop.Data.Entities;
 using MugShop.DTOs.MugDTOs;
 using MugShop.Helpers;
+using MugShop.Service.Interfaces.CategoriesInterfaces;
 using MugShop.Service.Interfaces.MugInterfaces;
+using MugShop.ViewModels;
 
 namespace MugShop.Service.Implementations.MugRepos
 {
@@ -13,10 +15,12 @@ namespace MugShop.Service.Implementations.MugRepos
     {
         public readonly AppDbContext _appDbContext;
         public readonly SKUGenerator _skuGenerator;
-        public MugRepo(AppDbContext appDbContext, SKUGenerator skuGenerator)
+        public readonly ICategory _categoryRepo;
+        public MugRepo(AppDbContext appDbContext, SKUGenerator skuGenerator, ICategory categoryRepo)
         {
             _appDbContext = appDbContext;
             _skuGenerator = skuGenerator;
+            _categoryRepo = categoryRepo;
         }
         public async Task<APIResponse> CreateMug(CreateMugDto mugInfo)
         {
@@ -69,25 +73,62 @@ namespace MugShop.Service.Implementations.MugRepos
                 IsSuccess = true
             };
         }
-        public async Task<GetAllMugsResponse> GetAllMugs(string? color, decimal? minPrice, decimal? maxPrice)
+        public async Task<GetAllMugsResponse> GetAllMugs(FilterInfoDto filterInfo)
         {
             var query = _appDbContext.Mugs
                 .Where(m => m.DeletedAt == null)
                 .AsQueryable();
 
-            if (!string.IsNullOrWhiteSpace(color))
+            if (!string.IsNullOrWhiteSpace(filterInfo.Color))
             {
-                query = query.Where(m => m.Color == color);
+                query = query.Where(m => m.Color == filterInfo.Color);
             }
 
-            if (minPrice.HasValue)
+            if (filterInfo.MinPrice.HasValue)
             {
-                query = query.Where(m => m.Price >= minPrice.Value);
+                query = query.Where(m => m.Price >= filterInfo.MinPrice.Value);
             }
-            if (maxPrice.HasValue)
+            if (filterInfo.MaxPrice.HasValue)
             {
-                query = query.Where(m => m.Price <= maxPrice.Value);
+                query = query.Where(m => m.Price <= filterInfo.MaxPrice.Value);
             }
+
+            switch (filterInfo.SortBy)
+            {
+                case "price-asc":
+                    query = query.OrderBy(q => q.Price);
+                    break;
+                case "price-desc":
+                    query = query.OrderByDescending(q => q.Price);
+                    break;
+                case "name-asc":
+                    query = query.OrderBy(q => q.Name);
+                    break;
+                case "name-desc":
+                    query = query.OrderByDescending(q => q.Name);
+                    break;
+                case "newest":
+                    query = query.OrderByDescending(q => q.CreatedAt);
+                    break;
+                default:
+                    query = query.OrderBy(q => q.Id);
+                    break;
+            }
+
+            var totalCount = await query.CountAsync();
+
+            if (totalCount == 0)
+                return new GetAllMugsResponse
+                {
+                    IsSuccess = false,
+                    Error = "No mugs found."
+                };
+
+            var toSkip = (filterInfo.PageNumber - 1) * filterInfo.PageSize;
+            var pagedQuery = query
+                .OrderBy(m => m.Id)
+                .Skip(toSkip)
+                .Take(filterInfo.PageSize);
 
             var mugs = await query.ToListAsync();
             if (mugs.Count == 0)
@@ -98,12 +139,14 @@ namespace MugShop.Service.Implementations.MugRepos
                     Error = "No mugs found."
                 };
             }
+
             var allColors = await _appDbContext.Mugs
             .Where(m => m.DeletedAt == null)
             .Select(m => m.Color)
             .Distinct()
             .OrderBy(c => c)
             .ToListAsync();
+
             var mugsToReturn = query.Select(mugs => new GetAllMugsDto
             {
                 Id = mugs.Id,
@@ -115,12 +158,24 @@ namespace MugShop.Service.Implementations.MugRepos
                 CategoryId = mugs.CategoryId,
                 SKU = mugs.SKU,
             }).ToList();
-
+            var categoriesResponse = await _categoryRepo.GetAllCategories();
+            var viewModel = new MugPageViewModel
+            {
+                Mugs = mugsToReturn,
+                Categories = categoriesResponse.Categories,
+                SelectedColor = filterInfo.Color,
+                MinPrice = filterInfo.MinPrice,
+                MaxPrice = filterInfo.MaxPrice,
+                AvailableColors = allColors,
+                PageSize = filterInfo.PageSize,
+                PageNumber = filterInfo.PageNumber,
+                TotalCount = totalCount,
+               
+            };
             return new GetAllMugsResponse
             {
                 IsSuccess = true,
-                Mugs = mugsToReturn,
-                AvailableColors = allColors
+                ViewModel = viewModel,
             };
         }
         public async Task<APIResponse> UpdateMug(UpdateMugDto mugInfo)

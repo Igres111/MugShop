@@ -4,6 +4,7 @@ using MugShop.Service.Implementations.CategoryRepos;
 using MugShop.Service.Interfaces.CategoriesInterfaces;
 using MugShop.Service.Interfaces.MugInterfaces;
 using MugShop.ViewModels;
+using System.IO;
 
 namespace MugShop.Controllers
 {
@@ -11,31 +12,19 @@ namespace MugShop.Controllers
     {
 
         public readonly IMug _mugRepo;
-        public readonly ICategory _categoryRepo;
-        public MugsController(IMug mugRepo, ICategory categoryRepo)
+        public MugsController(IMug mugRepo)
         {
             _mugRepo = mugRepo;
-            _categoryRepo = categoryRepo;
         }
 
-        public async Task<IActionResult> Index(string? color, decimal? minPrice, decimal? maxPrice)
+        public async Task<IActionResult> Index([FromQuery]FilterInfoDto filterInfo)
         {
-            var mugsResponse = await _mugRepo.GetAllMugs(color,minPrice,maxPrice);
-            var categoriesResponse = await _categoryRepo.GetAllCategories();
+            var mugsResponse = await _mugRepo.GetAllMugs(filterInfo);
             if (!mugsResponse.IsSuccess)
             {
                 return BadRequest(mugsResponse.Error);
             }
-            var viewModel = new MugPageViewModel
-            {
-                Mugs = mugsResponse.Mugs,
-                Categories = categoriesResponse.Categories,
-                SelectedColor = color,
-                MinPrice = minPrice,
-                MaxPrice = maxPrice,
-                AvailableColors = mugsResponse.AvailableColors
-            };
-            return View(viewModel);
+            return View(mugsResponse.ViewModel);
         }
     }
 }

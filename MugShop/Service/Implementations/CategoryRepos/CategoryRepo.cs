@@ -11,6 +11,7 @@ namespace MugShop.Service.Implementations.CategoryRepos
     public class CategoryRepo : ICategory
     {
         public readonly AppDbContext _context;
+
         public CategoryRepo(AppDbContext context)
         {
             _context = context;
