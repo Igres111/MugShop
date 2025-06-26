@@ -1,30 +1,103 @@
-﻿@using MugShop.Data.Entities
-@model List<MugShop.DTOs.MugDTOs.GetAllMugsDto>
+﻿@using MugShop.ViewModels
+@model MugPageViewModel
 
-<h1>Mugs</h1>
-
-
-    <div class="table">
-    <div>
-        <ol>
-            <li>SKU</li>
-            <li>Name</li>
-            <li>Color</li>
-            <li>Price</li>
-            <li>In Stock?</li>
-        </ol>
-        </div>
-        <div>
-        @foreach (var mug in Model)
+<div id="burger-menu" class="position-fixed top-0 end-0 p-3" style="z-index:1000;">
+    <button onclick="toggleMenu()" class="btn btn-dark">☰ Categories</button>
+    <div id="menu-content" class="mt-2 bg-white border p-2" style="display:none;">
+        @foreach (var category in Model.Categories)
         {
-            <div>
-                <p>@mug.SKU</p>
-                <p>@mug.Name</p>
-                <p>@mug.Color</p>
-                <p>@mug.Price.ToString("C")</p>
-                <p>@(mug.InStock ? "Yes" : "No")</p>
-            </div>
+            <p class="mb-1">@category.Name</p>
         }
-        </div>
     </div>
-}
+</div>
+
+<h1 class="mb-4 text-center">Mugs</h1>
+
+<form method="get" class="row g-3 align-items-end justify-content-center mb-4">
+    <div class="col-auto">
+        <label class="form-label">Color</label>
+        <select name="color" class="form-select">
+            <option value="">All</option>
+            @foreach (var c in Model.AvailableColors)
+            {
+                <option value="@c"
+                        selected="@(c == Model.SelectedColor ? "selected" : null)">
+                    @c
+                </option>
+            }
+        </select>
+    </div>
+
+    <div class="col-auto">
+        <label class="form-label">Min Price</label>
+        <input type="number"
+               name="minPrice"
+               step="0.01"
+               class="form-control"
+               placeholder="0.00"
+               value="@(Model.MinPrice?.ToString() ?? "")" />
+    </div>
+
+    <div class="col-auto">
+        <label class="form-label">Max Price</label>
+        <input type="number"
+               name="maxPrice"
+               step="0.01"
+               class="form-control"
+               placeholder="0.00"
+               value="@(Model.MaxPrice?.ToString() ?? "")" />
+    </div>
+
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary">Filter</button>
+        <a asp-action="Index"
+           asp-controller="Mugs"
+           class="btn btn-link ms-2">
+            Clear
+        </a>
+    </div>
+</form>
+
+<div class="d-flex gap-3">
+    <div class="flex-fill">
+        <p><strong>SKU</strong></p>
+        @foreach (var mug in Model.Mugs)
+        {
+            <p>@mug.SKU</p>
+        }
+    </div>
+
+    <div class="flex-fill">
+        <p><strong>Name</strong></p>
+        @foreach (var mug in Model.Mugs)
+        {
+            <p>@mug.Name</p>
+        }
+    </div>
+
+    <div class="flex-fill">
+        <p><strong>Color</strong></p>
+        @foreach (var mug in Model.Mugs)
+        {
+            <p>@mug.Color</p>
+        }
+    </div>
+
+    <div class="flex-fill">
+        <p><strong>Price</strong></p>
+        @foreach (var mug in Model.Mugs)
+        {
+            <p>@mug.Price.ToString("C")</p>
+        }
+    </div>
+
+    <div class="flex-fill">
+        <p><strong>In Stock?</strong></p>
+        @foreach (var mug in Model.Mugs)
+        {
+            <p>@(mug.InStock ? "Yes" : "No")</p>
+        }
+    </div>
+</div>
+
+<script src="~/js/burgerMenu.js"></script>

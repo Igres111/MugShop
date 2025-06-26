@@ -1,12 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MugShop.Service.Interfaces.CategoriesInterfaces;
 
 namespace MugShop.Controllers
 {
     public class CategoriesController : Controller
     {
-        public IActionResult Index()
+        private readonly ICategory _categoryRepo;
+        public CategoriesController(ICategory categoryRepo)
         {
-            return View();
+            _categoryRepo = categoryRepo;
         }
+
     }
 }

@@ -6,6 +6,5 @@ namespace MugShop.DTOs.CategoriesDTOs
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
-        public List<Mug> Mugs { get; set; } = new List<Mug>();
     }
 }
